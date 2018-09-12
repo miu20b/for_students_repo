@@ -1,0 +1,75 @@
+---
+title: "Biostats 597 HW1"
+author: Bing Miu
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+header-includes:
+  - \usepackage{color}
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+library(tidyverse)
+library(gapminder)
+```
+
+A look at the data:
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+gapminder
+```
+
+# HW exercises: 
+use ggplot to make the graphs requested in (1) and (2). Throughout, avoid repetition of code.
+Goal: gain experience with ggplot and reading help files/using google searches to get help on (arguments of) R functions. 
+
+1. make one scatter plot using ggplot with
+- Life expectancy on the y-axis, label axis as "Life expectancy"
+- GDP per capita on the x-axis, use a log-transform of the x-axis while still displaying the (unlogged) GDP values 
+- shapes to indicate the continent, add a legend
+- color to indicate the year, do NOT add a legend for that
+
+```{r}
+ggplot(data=gapminder, mapping = aes(x = gdpPercap, y=lifeExp)) +
+  labs(title= "Life expectancy at birth VS GDP per capital", x = "GDP per Capita (PPP)", y = "Life expectancy (years)") +
+  scale_x_continuous(trans = "log10") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_point(mapping = aes(color=year, shape=continent)) +
+  scale_color_continuous(guide= 'none')
+```
+
+
+
+2. add two geom_smooth layers (a) and (b) to the plot you made in (1) where
+(a) is fitted to the entire dataset and uses default settings for the smoother used and plotting settings
+
+
+```{r}
+ggplot(data=gapminder, mapping = aes(x = gdpPercap, y=lifeExp)) +
+  labs(title= "Life expectancy at birth VS GDP per capital", x = "GDP per Capita (PPP)", y = "Life expectancy (years)") +
+  scale_x_continuous(trans = "log10") +
+  theme(plot.title = element_text(hjust = 0.5))+
+  geom_point(mapping = aes(color=year, shape=continent)) +
+  scale_color_continuous(guide= 'none')+
+  geom_smooth()
+```
+
+(b) is fitted to data in Africa only, provides a 99% confidence interval, is plotted in red (both point estimates as well as confidence interval), and is transparent (so if it overlaps with (a), (a) is still visible). 
+Hint: to fit to data in Africa only, consider using "data = filter(gapminder, continent == "Africa")"
+
+```{r}
+ggplot(data=gapminder, mapping = aes(x = gdpPercap, y=lifeExp)) +
+  labs(title= "Life expectancy at birth VS GDP per capital", x = "GDP per Capita (PPP)", y = "Life expectancy (years)") +
+  scale_x_continuous(trans = "log10") +
+  theme(plot.title = element_text(hjust = 0.5))+ 
+  scale_color_continuous(guide= 'none') +
+  geom_point(mapping = aes(color=year, shape=continent)) +
+  geom_smooth() +
+    geom_smooth(data = filter(gapminder, continent== "Africa"), color="red", fill ='red', level = 0.99, alpha = 0.2)
+```
+
+\color{red}Red = fitted to data in Africa only    
+\color{blue}Blue = fitted to data in all continents
+
